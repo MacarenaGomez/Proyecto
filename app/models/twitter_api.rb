@@ -10,10 +10,9 @@ class TwitterApi < ActiveRecord::Base
     config.access_token_secret = ENV["ACCESS_TOKEN_SECRET"]
   end
 
-  def initialize expert_twitter, topic
-    @expert_twitter = expert_twitter
+  def initialize screen_name, topic
+    @screen_name = screen_name
     @topic = [topic,topic.upcase,topic.downcase,topic.capitalize]
-    @topic = @topic.map{|elem| '#'+ elem } + @topic
     @tweets = []
   end
 
@@ -22,6 +21,7 @@ class TwitterApi < ActiveRecord::Base
     getTweetsByDate
     getTweetsByHashtag
     getMostRetweetedFavoritTweets
+    @tweets
   end
   
   def getTimeline
@@ -30,7 +30,7 @@ class TwitterApi < ActiveRecord::Base
         options = {count: 200, include_rts: true}
         options[:max_id] = max_id unless max_id.nil?
 
-        @@client.user_timeline(@expert_twitter, options)
+        @@client.user_timeline(@screen_name, options)
       end
     rescue Exception => e
       puts e
@@ -51,22 +51,16 @@ class TwitterApi < ActiveRecord::Base
   end
 
   def getTweetsByDate
-    since = (Time.current - 6.month).strftime('%F') 
+    since = (Time.current - 1.year).strftime('%F') 
     @tweets = @tweets.select! do |item|
       item.created_at >= since
     end
   end
 
   def getMostRetweetedFavoritTweets
-    # @tweets = @tweets.order! do |item|
-    #   item.retweet_count > 100 || item.favorit_count > 100
-    # end
-
     @tweets.sort! do |t1,t2| 
-      t2.retweet_count <=> t1.retweet_count 
-      binding.pry
-   end
-    @tweets.sort! {|t1,t2| t2.favorit_count <=> t1.favorit_count}
+      t2.retweet_count.to_i <=> t1.retweet_count.to_i
+    end
   end
 
   # def getNameFriends(screen_name)

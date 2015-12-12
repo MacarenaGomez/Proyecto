@@ -11,12 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151211114640) do
+ActiveRecord::Schema.define(version: 20151212174327) do
 
   create_table "experts", force: :cascade do |t|
     t.string   "name"
-    t.string   "twitter"
-    t.string   "linkedin"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -30,6 +28,30 @@ ActiveRecord::Schema.define(version: 20151211114640) do
 
   add_index "knowledges", ["expert_id"], name: "index_knowledges_on_expert_id"
   add_index "knowledges", ["topic_id"], name: "index_knowledges_on_topic_id"
+
+  create_table "profiles", force: :cascade do |t|
+    t.integer  "expert_id"
+    t.string   "url"
+    t.string   "profile_image_url"
+    t.string   "location"
+    t.text     "description"
+    t.string   "profile_types"
+    t.string   "screen_name"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "profiles", ["expert_id"], name: "index_profiles_on_expert_id"
+
+  create_table "resources", force: :cascade do |t|
+    t.integer  "tweet_id"
+    t.string   "source_type"
+    t.string   "source"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "resources", ["tweet_id"], name: "index_resources_on_tweet_id"
 
   create_table "topics", force: :cascade do |t|
     t.string   "name"

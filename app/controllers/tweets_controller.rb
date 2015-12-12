@@ -1,26 +1,55 @@
 class TweetsController < ApplicationController
 
   def index
-    # Devuelve un experto y su lista de tweets relevante
-    # Buscamos primero en nuestra bd
-    topic = Topic.find_by(name: params[:topic].downcase)
-    expert = topic.experts[0]
-    tweets = expert.tweets
-    if tweets.size == 0 # || expert
-      api = TwitterApi.new(expert.twitter, topic.name)
+    topic = Topic.find_by(name: params[:topic])
+    
+    if topic.experts.empty?
+   
+      render(status:400, json: {error: 'Error'})
+   
+    elsif topic.experts[0].tweets.size == 0
+      expert = topic.experts[0]
+      #Buscamos twitter...
+      screen_name = expert.profiles.where(profile_types: 'twitter')[0].screen_name
+      api = TwitterApi.new(screen_name, topic.name)
       tweets = api.getExpertTweets
       tweets.each do |elem|
-        binding.pry
-        #Tweet.create(text: elem.text, rate: 0, date: elem.created_at, link: elem.)
+        new_tweet = Tweet.create(text: elem.text, rate: 0, date: elem.created_at)
+      
+        entities = elem.to_h[:entities]
+        if (entities.has_key?(:urls))
+          addResources(entities[:urls],new_tweet)
+        end
+
+        if (entities.has_key?(:media))
+          addResources(entities[:media],new_tweet)
+        end
+        expert.tweets << new_tweet
       end
     end
-  
-    render(status:200, json: {expert: expert, tweets: tweets})
+    
+    expert = topic.experts[0] #Cogemos el primero por ahora
+    tweets = expert.tweets
+
+    render(status:200, json: {expert: expert.name,
+                              profile: expert.profiles[0], 
+                              tweets: tweets})
 
   end
 end
 
-
+private 
+  def addResources(cosas, tweet)
+   if (cosas.size != 0)
+      cosas.each do |elem|
+        source_type = elem.has_key?(:type) ? elem[:type] : 'link'
+        source = elem.has_key?(:expanded_url) ? elem[:expanded_url] : elem[:media_url]
+        r = Resource.create(source_type: source_type, source: source)
+      
+        tweet.resources << r 
+      end
+    end
+  end
 =begin
   
 def show
