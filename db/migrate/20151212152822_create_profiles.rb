@@ -6,7 +6,7 @@ class CreateProfiles < ActiveRecord::Migration
       t.string :profile_image_url
       t.string :location
       t.text   :description
-      t.string :profile_types
+      t.string :profile_type
       t.string :screen_name
       t.timestamps null: false
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151212174327) do
+ActiveRecord::Schema.define(version: 20151213191251) do
 
   create_table "experts", force: :cascade do |t|
     t.string   "name"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 20151212174327) do
     t.string   "profile_image_url"
     t.string   "location"
     t.text     "description"
-    t.string   "profile_types"
+    t.string   "profile_type"
     t.string   "screen_name"
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
@@ -64,9 +64,10 @@ ActiveRecord::Schema.define(version: 20151212174327) do
     t.string   "text"
     t.integer  "rate"
     t.date     "date"
-    t.string   "link"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "friend_id"
+    t.string   "tweet_type"
   end
 
   add_index "tweets", ["expert_id"], name: "index_tweets_on_expert_id"

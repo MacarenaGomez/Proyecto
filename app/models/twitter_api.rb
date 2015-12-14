@@ -1,5 +1,5 @@
 class TwitterApi < ActiveRecord::Base
-
+  
   attr_reader :topic, :expert_twitter
 
   #Configuración
@@ -14,14 +14,15 @@ class TwitterApi < ActiveRecord::Base
     @screen_name = screen_name
     @topic = [topic,topic.upcase,topic.downcase,topic.capitalize]
     @tweets = []
+    @friends = []
   end
 
-  def getExpertTweets
+  def getExpertTweets 
     getTimeline
     getTweetsByDate
     getTweetsByHashtag
     getMostRetweetedFavoritTweets
-    @tweets
+    @tweets = @tweets[0..10]
   end
   
   def getTimeline
@@ -63,39 +64,20 @@ class TwitterApi < ActiveRecord::Base
     end
   end
 
-  # def getNameFriends(screen_name)
-  #   begin
-  #     @friends = Array.new
-  #     @@client.friends(screen_name: screen_name).take(30).each do |friend|
-  #       @friends.push({screen_name: friend.screen_name, name: friend.name, id: friend.id})
-  #     end
-  #     @friends
-  #   rescue Exception => e
-  #     puts e
-  #     puts("Errors: #{e.to_s}")
-  #   end
-  # end
+  def getBestFriends
+    begin
+      @@client.friends(@screen_name).each do |friend|
+        @friends.push(friend)
+      end
+      @friends
+    rescue Exception => e
+      puts e
+      puts("Errors: #{e.to_s}")
+    end
+  end
 
-  # def getMostPopularTweets(hashtag,screen_name)
-    
-  #   begin
-  #     @tweets = Array.new
+  def orderByFollowers
+    @friends = @friends.sort!{|f1,f2| f2.followers_count <=> f1.followers_count}
+  end
 
-  #     since_date = (Time.now - 1.year).strftime('%Y-%m-%d')
-  #     until_date = Time.now.strftime('%Y-%m-%d')
-
-  #     #jQuery jQuery #jQuery from:jeresig since:2015-07-10 until:2015-12-10 include:retweets
-  #     to_search = transformHastag(hashtag) + " from:#{screen_name}"
-    
-  #     @@client.search("from:jeresig").each do |tweet|
-  #        @tweets.push(tweet.to_h)
-  #     end
-  #     binding.pry
-  #     @tweets
-  #   rescue Exception => e
-  #     puts e
-  #     puts("Errors: #{e.to_s}")
-  #   end
-  
-  # end  
 end

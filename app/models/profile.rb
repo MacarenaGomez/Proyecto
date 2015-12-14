@@ -3,5 +3,5 @@ class Profile < ActiveRecord::Base
 
   validates :url, uniqueness: true
   validates :url, presence: true
-  validates :profile_types, presence: true
+  validates :profile_type, presence: true
 end

@@ -13,7 +13,7 @@ p = Profile.create(url: 'https://twitter.com/jeresig',
             profile_image_url:"http://pbs.twimg.com/profile_images/628273703587975168/YorO7ort_normal.png",
             location:"Brooklyn, NY", 
             description:"Creator of @jquery, JavaScript programmer, author, Japanese woodblock nerd (http://t.co/vc69XXB4fq), work at @khanacademy.",
-            profile_types: "twitter", screen_name: "jeresig")
+            profile_type: "twitter", screen_name: "jeresig")
 
 t1.experts << e
 t2.experts << e

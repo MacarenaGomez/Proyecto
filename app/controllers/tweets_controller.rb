@@ -9,31 +9,56 @@ class TweetsController < ApplicationController
    
     elsif topic.experts[0].tweets.size == 0
       expert = topic.experts[0]
-      #Buscamos twitter...
-      screen_name = expert.profiles.where(profile_types: 'twitter')[0].screen_name
-      api = TwitterApi.new(screen_name, topic.name)
-      tweets = api.getExpertTweets
-      tweets.each do |elem|
-        new_tweet = Tweet.create(text: elem.text, rate: 0, date: elem.created_at)
       
-        entities = elem.to_h[:entities]
-        if (entities.has_key?(:urls))
-          addResources(entities[:urls],new_tweet)
-        end
+      screen_name = expert.profiles.where(profile_type: 'twitter')[0].screen_name
+      getTweets(screen_name, topic.name, expert)
+      #getFriends(screen_name, topic.name, expert)
 
-        if (entities.has_key?(:media))
-          addResources(entities[:media],new_tweet)
-        end
-        expert.tweets << new_tweet
-      end
     end
     
     expert = topic.experts[0] #Cogemos el primero por ahora
-    tweets = expert.tweets
-
     render(status:200, json: {expert: expert.name,
                               profile: expert.profiles[0], 
-                              tweets: tweets})
+                              tweets: expert.tweets})
+
+  end
+end
+
+def getTweets screen_name, topic, expert
+  
+  api = TwitterApi.new(screen_name, topic)
+  tweets = api.getExpertTweets
+ 
+  tweets.each do |elem|
+    new_tweet = Tweet.create(text: elem.text, rate: 0, date: elem.created_at, 
+                             tweet_type:elem.to_h.has_key?('retweeted_status') ? 'RT' : 'TW' ,
+                             friend_id: elem.to_h.has_key?('retweeted_status') ? retweeted_status.id : 0)
+  
+    entities = elem.to_h[:entities]
+    if (entities.has_key?(:urls))
+      addResources(entities[:urls],new_tweet)
+    end
+
+    if (entities.has_key?(:media))
+      addResources(entities[:media],new_tweet)
+    end
+    
+    expert.tweets << new_tweet
+  end
+
+end
+
+def getFriends screen_name, topic
+  
+  api = TwitterApi.new(screen_name, topic)
+  friends = api.getBestFriends
+  friends.each do |friend|
+    new_expert = Expert.create(name: friend.name)
+    new_expert.profiles.create(url: friend.url, profile_image_url: friend.profile_image_url,
+                               location: friend.location, description: friend.description, 
+                               profile_types:'twitter', screen_name: friend.screen_name)
+    
+    getTweets(friend.screen_name,topic.name)
 
   end
 end
