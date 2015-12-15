@@ -1,36 +1,37 @@
 <div class="container-fluid navigator">
   <div class="row">
     <div class="col-md-6 logo">
-      <h1><strong class="f5">F5</strong><span class="letter">u</span></h1>
+      <strong class="f5">F5</strong><span class="letter">u</span>
     </div>
-    <div class="col-md-6 social">
-      <h1><strong class="f5">F5</strong><span class="letter">u</span></h1>
-    </div>
+    <!-- <div class="col-md-6 social">
+      <strong><a href="/password/new">Log in</a></strong>
+    </div> -->
   </div>
 
   <section class="content axis">
     <div class="row searcher">
-      <div class="col-md-12">
+      <div class="col-md-12 input">
         <form class="js-form">
-          <span class="input">
+          <span>
             <input class="input__field" type="text" id="searcher" />
             <label class="input__label" for="searcher">
               <span class="input__label-content">What do you want to search?</span>
             </label>
           </span>
         </form>
+        <button class="btn btn-twitter clicked"><i class="fa fa-twitter"></i> | Search in twitter</button>
+        <button class="btn btn-linkedin clicked"><i class="fa fa-linkedin"></i> | Search in linkedin</button>
       </div>
     </div> 
   </section>
 </div> 
-
 <section class="content">
   <div data-hook="masters-info" class="row results">
     <div class="col-md-4 recent_search">
       
     </div>
     <div data-hook="twitter" class="col-md-4 twitter">
-     
+      
     </div>
    
     <div data-hook="linkedin" class="col-md-12 linkedin">
@@ -38,3 +39,5 @@
     </div>
   </div>
 </section>
+
+
