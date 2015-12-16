@@ -5,33 +5,19 @@ class TweetsController < ApplicationController
     topic = Topic.find_by(name: params[:topic])
     screen_name = params[:screen_name]
 
-    expert = (screen_name != nil) ? Profile.find_by(screen_name: screen_name).expert : topic.experts[0]
-
-    if topic.experts.empty?
+    if topic.nil? || topic.experts.nil?
       # y como lo rellenamos?!?!
-      render(status:400, json: {error: 'Error'})
-    
-    elsif expert.tweets.size == 0
-      
-      screen_name = expert.profiles.where(profile_type: 'twitter')[0].screen_name
-      getTweets(screen_name, topic.name, expert)
-      getBestFriends(screen_name, topic, expert)
-
+      #render(status:418, json: {error: 'I'm a teapot!})
+      render(status:424, json: {error: 'Vuelva más tarde!'})
+    else
+     json = Search.new(topic.name,screen_name).info_of topic.name
+     render(status:200, json: json)
     end
-    
-    others  = []
-    topic.experts[1..(topic.experts.length-1)].each do |expert|
-      others << {expert: expert.name, screen_name:expert.profiles[0].screen_name, profile: expert.profiles[0],tweets: expert.tweets}
-    end
-
-    render(status:200, json: {expert: expert.name,
-                              screen_name: expert.profiles[0].screen_name,
-                              profile: expert.profiles[0], 
-                              tweets: expert.tweets,
-                              others: others})
   end
+  
 end
 
+=begin
 def getTweets screen_name, topic, expert
   
   api = TwitterApi.new(screen_name, topic)
@@ -40,13 +26,14 @@ def getTweets screen_name, topic, expert
   tweets.each do |elem|
     new_tweet = Tweet.create(text: elem.text, rate: 0, date: elem.created_at, 
                              tweet_type:elem.to_h.has_key?('retweeted_status') ? 'RT' : 'TW' ,
-                             friend_id: elem.to_h.has_key?('retweeted_status') ? retweeted_status.id : 0)
-
-    if (elem.to_h[:entities].has_key?(:urls))
+                             friend_id: elem.to_h.has_key?('retweeted_status') ? elem.retweeted_status.id : 0)
+  
+    entities = elem.to_h[:entities]
+    if (entities.has_key?(:urls))
       addResources(entities[:urls],new_tweet)
     end
 
-    if (elem.to_h[:entities].has_key?(:media))
+    if (entities.has_key?(:media))
       addResources(entities[:media],new_tweet)
     end
     
@@ -90,3 +77,4 @@ private
       end
     end
   end
+=end

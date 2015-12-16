@@ -6,7 +6,7 @@
 
 t1 = Topic.create(name: 'jQuery')
 t2 = Topic.create(name: 'javascript')
-e = Expert.create(name: 'John Resig')
+e = Expert.create(name: 'John Resig', rate: 10)
 p = Profile.create(url: 'https://twitter.com/jeresig',
                    profile_image_url:"http://pbs.twimg.com/profile_images/628273703587975168/YorO7ort_normal.png",
                    location:"Brooklyn, NY", 

@@ -23,6 +23,7 @@ class TwitterApi < ActiveRecord::Base
     tweets = getTimeline(@screen_name,true)
     tweets = getTweetsByHashtag(tweets)
     tweets = getTweetsByDate(tweets)
+    
     tweets = getMostRetweetedFavoritTweets(tweets)
     tweets[0..4]
   end

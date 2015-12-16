@@ -120,13 +120,18 @@
   //   $('.btn-linkedin').toggleClass('clicked');
   // });
 
+  function getError(error){
+    console.error("Error searching topic: " + error);
+    $('#loading').addClass("hidden");
+  }
+
   $(document).on('ready',function(){
     $('#searcher').on('keypress', function(event){
       if (event.keyCode == 13){ 
         topic = $('#searcher').val();
         event.preventDefault();
         
-        ajax.execute('/f5App/api/tweets/' + topic, getTweets);
+        ajax.execute('/f5App/api/tweets/' + topic, getTweets, getError);
         $('#loading').removeClass("hidden");
       }
     });
