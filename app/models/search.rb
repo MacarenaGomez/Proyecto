@@ -2,16 +2,13 @@ class Search
   
   attr_accessor :screen_name, :topic
 
-  def initialize topic, screen_name
+  def initialize topic, screen_name, second_round
     @screen_name = screen_name
     @topic = topic
     @expert = ''
     @tweets = []
     @friends = []
-  end
-
-  def create_api
-    @api = TwitterApi.new(@screen_name, @topic)
+    @second_round = second_round
   end
 
   def create_tweet tweet
@@ -28,7 +25,7 @@ class Search
   end
 
   def create_expert name
-    @expert = Expert.create(name: name)
+    e = Expert.create(name: name, rate: 0)
   end
 
   def create_profile friend
@@ -44,33 +41,95 @@ class Search
     r = Resource.create(source_type: source_type, source: source)
   end
 
-  def tweets_of
-    @tweets = @api.getExpertTweets.each do |tweet|
-      @expert.tweets << create_tweet(tweet)
+  def tweets_by_hashtag tweets
+    topic = [@topic.name,@topic.name.upcase,@topic.name.downcase,@topic.name.capitalize]
+    tweets.select! do |item|
+      topic.any? {|str| item.text.include?(str)} 
     end
+    tweets
+  end
+
+  def tweets_by_date tweets
+    since = (Time.current - 1.year).strftime('%F') 
+    tweets.select! do |item|
+      item.created_at >= since
+    end
+    tweets
+  end
+
+  def most_retweeted_favorit_tweets tweets
+    tweets.sort! do |t1,t2| 
+      t2.retweet_count <=> t1.retweet_count
+    end
+    tweets
+  end
+
+  def tweets_of name, keep_tracking
+    tweets = TwitterApi.twitter_timeline(@screen_name, keep_tracking)
+
+    tweets = filter_tweets(tweets)
+    expert = Expert.find_by(name: name)
+   
+    tweets.each do |tweet|
+      expert.tweets << create_tweet(tweet)
+    end
+
+    tweets
+    puts "Tweets loaded..."
+  end
+
+  def filter_tweets tweets
+    tweets_by_hashtag(tweets)
+    tweets_by_date(tweets)
+    most_retweeted_favorit_tweets(tweets)
+    tweets[0..4]
   end
 
   def friends_of
-    
-    @friends = @api.getBestFriends.each do |friend|
-      binding.pry
-     
-      if expert_no_exits?(friend.name) 
-        new_expert = create_expert friend.name
-       binding.pry 
-        topic.experts << new_expert
-    binding.pry
-        profile = create_profile friend
-        new_expert.profiles << profile
-    binding.pry
-      end
+    @friends = TwitterApi.twitter_friends(@screen_name)
 
+    order_by_followers
+    
+    @friends[0..24].each do |friend|
+      if expert_no_exits?(friend.name) 
+        
+        new_expert = create_expert(friend.name)
+        new_expert.profiles << create_profile(friend)
+      
+        @topic.experts << new_expert
+      end
+      @topic.experts.each do |ex|
+        if (ex.name != @expert.name)
+          @screen_name = ex.profiles.find_by(profile_type: 'twitter').screen_name
+          tweets = tweets_of(ex.name,true)
+        end  
+      end
     end
 
+    delete_experts
+
+    puts "Friends loaded..."
+  end
+
+  def delete_experts
+    experts = @topic.experts.select do |expert| 
+      binding.pry
+      expert.tweets.size != 0
+      binding.pry
+    end
+    binding.pry
+    @topic.experts = experts
   end
 
   def expert_no_exits? name
     Expert.find_by(name: name).nil?
+  end
+
+  def order_by_followers 
+    @friends.sort! do |f1,f2| 
+      f2.followers_count <=> f1.followers_count
+    end
+    @friends[0..24]
   end
 
   def add_resources collection, tweet
@@ -83,7 +142,7 @@ class Search
 
   def most_rated_expert 
     begin
-      @expert = Topic.find_by(name: @topic).experts.order('rate DESC').first
+      @expert = Topic.find_by(name: @topic.name).experts.order('rate DESC').first
     rescue Exception => e
       @expert = nil
     end
@@ -95,7 +154,6 @@ class Search
 
   def get_expert_screen_name
     if (@screen_name != nil) 
-          binding.pry
       @expert = Profile.find_by(screen_name: @screen_name).expert 
     else
       most_rated_expert
@@ -104,27 +162,27 @@ class Search
   end
 
   def others
-    others = []
-    experts = Expert.where.not(name: @expert.name)
-    experts.each do |expert|
-      others << {expert: expert.name, screen_name:expert.profiles[0].screen_name, profile: expert.profiles[0],tweets: expert.tweets}
+    others_experts = []
+    Expert.where.not(name: @expert.name).each do |expert|
+      others_experts << {expert: expert.name, screen_name:expert.profiles[0].screen_name, profile: expert.profiles[0],tweets: expert.tweets}
     end
-    others
-    binding.pry
+    others_experts
   end
 
-  def info_of topic 
+  def info_of  
   
-    @topic = topic
     get_expert_screen_name
-    
-    if @expert.tweets.size == 0
-      create_api
-      tweets_of
-      friends_of
-    end
 
-    binding.pry
+    if @expert.tweets.size == 0 
+      puts "Searching for tweets..."
+      tweets_of @expert.name, true
+      
+      if !@second_round
+        puts "Searching for friends..."
+        friends_of
+      end
+
+    end
 
     json = {expert: @expert.name,
             screen_name: @expert.profiles[0].screen_name,
@@ -132,4 +190,5 @@ class Search
             tweets: @expert.tweets,
             others: others}
   end
+
 end

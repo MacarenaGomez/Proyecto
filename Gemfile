@@ -40,6 +40,7 @@ gem "font-awesome-rails"
 gem 'devise'
 gem 'devise-bootstrap-views'
 gem 'handlebars_assets'
+gem 'whenever', :require => false
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
