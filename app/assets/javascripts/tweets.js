@@ -7,17 +7,6 @@
   function getTweets(response){
     var $expertContainer = $('[data-hook=twitter]')
     $expertContainer.empty();
-    // var htmlParts = ['<div class="row expert">', 
-    //                   '   <div class="thumbnail" data-expert="'+ response.profile.screen_name +'">']
-    //    htmlParts.push('     <img src="' + response.profile.profile_image_url + '" style="float: left;margin: 5px;">');
-    //    htmlParts.push('     <h3>' + response.expert + '</h3>');
-    //    htmlParts.push('     <h4>' + response.profile.location + '</h4>');
-    //    htmlParts.push('     <br>');
-    //    htmlParts.push('     <p>' + response.profile.description + '</p>');
-    //    htmlParts.push('   </div>');
-    //    htmlParts.push('</div>');
-    // $expertContainer.append(htmlParts.join('\n'));
-
     var context = [{screen_name: response.profile.screen_name,
                      profile_image_url: response.profile.profile_image_url, 
                      expert: response.expert,
@@ -43,13 +32,13 @@
     
     var $tweetsContainer = $('[data-expert=' + response.profile.screen_name +']');
     
-       var tweetParts = ['<div data-hook="tweets"  class="col-md-12 tweets">'];
+       var tweetParts = ['<div data-hook="tweets" class="col-md-12 tweets">'];
        tweetParts.push('  <div class="row">');
        tweetParts.push('    <div class="span5">');
-       tweetParts.push('      <h1>More interesting tweets</h1>');
-       tweetParts.push('      <table class="table table-striped">');
+       tweetParts.push('      <h1 class="most-interesting">Most interesting tweets</h1>');
+       tweetParts.push('      <table class="table">');
        tweetParts.push('        <tr>');
-       tweetParts.push('          <th>Text</th>');
+       tweetParts.push('          <th class="texto">Text</th>');
        tweetParts.push('        </tr>');
     
     response.tweets.forEach(function(tt){
@@ -64,8 +53,18 @@
 
     $tweetsContainer.after(tweetParts.join('\n'));
 
+    // var $tweetsContainer = $('.tweets');//'[data-expert=' + response.profile.screen_name +']');
+    // var tweets = []
+    // response.tweets.forEach(function(tt){
+    //    tweets.push( {text: tt.text});
+    // });
+    
+    // $tweetsContainer.html(HandlebarsTemplates['site/home']({tweets: tweets}));
+    // var $others = $('.span5.others');
+    // $tweetsContainer.after('<h1>Others you may be interested in:</h1>');
 
     $('.input').addClass("js-axis-hover", "slow");
+    $('#searcher').blur();
     $('#loading').addClass("hidden");
   } 
 
@@ -98,29 +97,22 @@
     $('#loading').addClass("hidden");
   } 
 
-   $(document).on('click', '.other', function(event){
-      event.preventDefault();
-      
-      var screen_name = $(event.currentTarget).attr('data-expert');
-
-      ajax.execute('/f5App/api/tweets/' + topic +'/' + screen_name, getTweetsOther, getError);
-      $('#loading').removeClass("hidden");
-   });
-
-
-  // $('.btn-twitter').on('click',function(){
-  //   $('.btn-twitter').toggleClass('clicked');
-  // });
-
-  // $('.btn-linkedin').on('click',function(){
-  //   $('.btn-linkedin').toggleClass('clicked');
-  // });
-
-  function getError(error){
+ function getError(error){
     console.error("Error searching topic: " + error);
     $('#loading').addClass("hidden");
   }
 
+  //Others tweets
+  $(document).on('click', '.other', function(event){
+    event.preventDefault();
+      
+    var screen_name = $(event.currentTarget).attr('data-expert');
+
+    ajax.execute('/f5App/api/tweets/' + topic +'/' + screen_name, getTweetsOther, getError);
+    $('#loading').removeClass("hidden");
+  });
+ 
+  //Searching for topic
   $(document).on('ready',function(){
     $('#searcher').on('keypress', function(event){
       if (event.keyCode == 13){ 

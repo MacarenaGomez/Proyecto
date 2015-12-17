@@ -1,13 +1,15 @@
 // Place all the styles related to the pruebas controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
+
 body.grey_background {
-  background-color: #ecf0f1;
+  background-color: #f4f4f4;
 }
 
 .navigator {
-  background-color: black;
-  height: 150px;
+  background-color: #222;
+  height: 142px;
 }
 
 .f5 {
@@ -282,9 +284,38 @@ input[type]:focus,
    text-align: center;
 }
 
-// #loading-image {
-//   position: absolute;
-//   top: 100px;
-//   left: 240px;
-//   z-index: 100;
-// }
+.thumbnail {
+  padding: 10px 20px !important;
+}
+
+.span5 {
+  padding: 0 10px;
+}
+
+.texto {
+  padding: 16px;
+}
+
+.tweets {
+  border-color: #ccc;
+}
+
+#searcher {
+  border: 1px solid #ddd;
+}
+
+.table.table-striped {
+  font-family: 'Open Sans';
+  font-weight: 300;
+}
+
+.col-md-12.tweets {
+  margin-bottom: 20px;
+}
+
+.most-interesting {
+  color: #f39c12 !important;
+  font-family: 'Open Sans' !important;
+  font-size: 34px !important;
+  font-weight: 600 !important;
+}

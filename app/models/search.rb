@@ -90,7 +90,7 @@ class Search
 
     order_by_followers
     
-    @friends[0..24].each do |friend|
+    @friends[0..5].each do |friend|
       if expert_no_exits?(friend.name) 
         
         new_expert = create_expert(friend.name)
