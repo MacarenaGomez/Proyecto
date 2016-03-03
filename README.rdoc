@@ -1,3 +1,11 @@
-Este es el proyecto desarrollado en los diez últimos días de curso en Ironhack. 
-Es un prototipo. No está terminado. 
+Este proyecto surgió a raiz de la desactualización en redes sociales de los perfiles de los usuarios, desde una perspectiva profesional. Se debe cuidar mucho lo que publicamos en las redes sociales y más sabiendo que para las empresas es consulta obligada para sus candidatos a un puesto de trabajo.
+El proyecto pretende ser un muy, muy, muy humilde buscador de conocimiento en la jungla de twitter. El usuario puede proporcionar un 'topic' que es buscado primeramente en la base de datos propia para devolver un experto en la materia al que poder seguir en twitter. A patir de este experto se busca entre las personas a las que éste sigue, de esta forma la aplicación te mostrará los tuits más retuiteados o con más 'likes' del experto, además de otras personas consideradas por la aplicación como relevantes y de interés.
 
+Cabe destacar que internamente la aplicación cuenta con un cron job que ataca la api de twitter.
+
+¡Eso es todo amigos!
+
+Este es el proyecto desarrollado en los diez últimos días de curso en Ironhack. 
+Es un prototipo. No está terminado ni mucho menos optimizado o refactorizado, las cosas estás descolocadas... pero lo importante es continuar en el camino. :)
+
+Por favor, cualquier mejora, sugerencia, comentario, 'whatever' sieeeempre será bienvenida.
